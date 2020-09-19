@@ -33,7 +33,7 @@ skim(hr_dataset) # summary statistics
 
 ```
 
-Data set reveals there are 26 Quantitative and 9 qualitative parameters about employees working at IBM. However, this is not a true picture as there are many rating-based and level-based variables Viz. Education level, Environment satisfaction etc. which have been coded as numeric values and hence a basic data cleaning is necessary. One important observation is that the data has no missing values.
+Data set reveals there are 26 Quantitative and 9 qualitative parameters about employees working at IBM. However, this is not a true picture as there are many rating-based and level-based variables Viz. Education level, Environment satisfaction etc. which have been coded as numeric values and hence a basic data cleaning is necessary. One important observation is that the data has no missing values. 
 
 ## Data cleaning and reorganising
 
