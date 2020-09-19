@@ -262,14 +262,15 @@ title: Pay Discrimination Analysis at Omega
 </tr>
 </tbody>
 </table>
+<p>There are no missing variables in the data frame</p>
 </div>
 <div id="relationship-salary---gender" class="section level2">
 <h2>Relationship Salary - Gender ?</h2>
 <p>Overall salaries by gender are analysed below in visual and tabular form.</p>
 <pre class="r"><code># Examining the overall salaries by gender via boxplot
 omega %&gt;% 
-  ggplot(aes(x=gender, y=salary)) + # specifying the axes
-        geom_boxplot() + # creating a boxplot
+  ggplot(aes(x=gender, y=salary, fill=gender)) + # specifying the axes and colouring
+        geom_boxplot(alpha=0.3) + # creating a boxplot and setting transparency 
         theme_bw() + # adding a black and white theme
         labs(title = &quot;The median salary for men is higher at Omega overall&quot;, x = &quot;Gender&quot;, y = &quot;Salary&quot;) # labelling title and axes</code></pre>
 <p><img src="/blogs/blog8_files/figure-html/confint_single_valiables-1.png" width="672" /></p>
@@ -360,8 +361,8 @@ p_value_by_gender&lt;-salary_by_gender %&gt;% # creating a new variable
 <p>At the board meeting, someone raised the issue that there was indeed a substantial difference between male and female salaries, but that this was attributable to other reasons such as differences in experience. A questionnaire send out to the 50 executives in the sample reveals that the average experience of the men is approximately 21 years, whereas the women only have about 7 years experience on average (see table below).</p>
 <pre class="r"><code># Summary Statistics of salary by gender
 omega %&gt;% 
-  ggplot(aes(x = gender, y = experience)) + # specifying axes
-  geom_boxplot() # creating a boxplot</code></pre>
+  ggplot(aes(x = gender, y = experience, fill=gender)) + # specifying axes
+  geom_boxplot(alpha=0.3) # creating a boxplot</code></pre>
 <p><img src="/blogs/blog8_files/figure-html/experience_stats-1.png" width="672" /></p>
 <pre class="r"><code>stats_exp_gender &lt;- favstats (experience ~ gender, data=omega) # using favstats by specifying the variables of interest and data frame</code></pre>
 <p>It seems from the graph and the table that Omega has relatively less experienced women employees.</p>
@@ -447,9 +448,8 @@ p_value_exp_gender &lt;- experience_in_null %&gt;% # creating a new variable
 <p>As can be seen, there is a significant positive relationship between years of experience and salary. It can also be seen what was confirmed in the previous section, that women have significantly less experience than men, with a cut off point displayed above at around 30 years. This gives an alternative reasoning besides discrimination regarding the pay gap, as more years of experience are a valuable asset that is accordingly financially rewarded with a greater salary.</p>
 <p>Another intersting perspective can be that more men are hired with higher years of experience than women. If a true comparison has to be made between the salaries of the two groups, both should have comparable distribution of years of experience which is not the case. Hence, no conclusion about the original question can be drawn from the above analysis</p>
 </div>
-<div id="check-correlations-between-the-data" class="section level2">
-<h2>Check correlations between the data</h2>
-<p>You can use <code>GGally:ggpairs()</code> to create a scatterplot and correlation matrix. Essentially, we change the order our variables will appear in and have the dependent variable (Y), salary, as last in our list. We then pipe the dataframe to <code>ggpairs()</code> with <code>aes</code> arguments to colour by <code>gender</code> and make ths plots somewhat transparent (<code>alpha  = 0.3</code>).</p>
+<div id="correlations-between-the-data" class="section level2">
+<h2>Correlations between the data</h2>
 <pre class="r"><code>omega %&gt;% 
   select(gender, experience, salary) %&gt;% #order variables they will appear in ggpairs()
   ggpairs(aes(colour=gender, alpha = 0.3))+

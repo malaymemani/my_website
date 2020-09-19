@@ -11,8 +11,8 @@ title: IBM HR Analytics
 
 
 <p>The <a href="https://www.kaggle.com/pavansubhasht/ibm-hr-analytics-attrition-dataset">IBM HR Analytics Employee Attrition &amp; Performance dataset</a> is a fictional data set created by IBM data scientists. Among other things, the data set includes employees’ income, their distance from work, their position in the company, their level of education, etc. A full description can be found on the website.</p>
-<div id="data-cleaning-and-reorganising" class="section level2">
-<h2>Data cleaning and reorganising</h2>
+<div id="loading-the-data-and-summary-statistics" class="section level2">
+<h2>Loading the data and summary statistics</h2>
 <p>At first, the data set is loaded and summary statistics are provided.</p>
 <pre class="r"><code>hr_dataset &lt;- read_csv(here::here(&quot;data&quot;, &quot;datasets_1067_1925_WA_Fn-UseC_-HR-Employee-Attrition.csv&quot;)) # loading data set</code></pre>
 <pre><code>## Parsed with column specification:
@@ -537,6 +537,9 @@ title: IBM HR Analytics
 </tbody>
 </table>
 <p>Data set reveals there are 26 Quantitative and 9 qualitative parameters about employees working at IBM. However, this is not a true picture as there are many rating-based and level-based variables Viz. Education level, Environment satisfaction etc. which have been coded as numeric values and hence a basic data cleaning is necessary. One important observation is that the data has no missing values.</p>
+</div>
+<div id="data-cleaning-and-reorganising" class="section level2">
+<h2>Data cleaning and reorganising</h2>
 <pre class="r"><code># Basic Data Cleaning and re-coding of levels
 
 hr_cleaned &lt;- hr_dataset %&gt;% 
@@ -913,16 +916,6 @@ Work&lt;-hr_cleaned%&gt;% # creating variable
   group_by(department)%&gt;% # grouping by department
   count(work_life_balance)%&gt;% # counting variable enclosed by grouped variable
   mutate(n_percent=n/sum(n)) # adding a proportion</code></pre>
-<pre class="r"><code>ggplot(Edu,aes(x=department,  # speciyfying axes
-               y=n_percent, 
-               fill=factor(education, levels=c( &quot;Doctor&quot;,&quot;Master&quot;, &quot;Bachelor&quot;, &quot;College&quot;, &quot;Below College&quot;))))+
- geom_col()+ # generating graph
-labs(title=&quot;Education Level by Department at IBM&quot;, # adding labels and colouring 
-       x=&quot;Department&quot;,
-       y=&quot;Percentage Education&quot;,
-       fill= &quot;Education Level&quot;)+
-    theme(axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=0.5)) # adjusting x axis label</code></pre>
-<p><img src="/blogs/blog6_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <pre class="r"><code>ggplot(Edu)+
   aes(x=education, y = n_percent, fill = education)+ # speciyfying axes
   geom_col()+  # generating graph
@@ -932,18 +925,8 @@ labs(title=&quot;Education Level by Department at IBM&quot;, # adding labels and
        y=&quot;Percentage Education&quot;,
        fill= &quot;Education Level&quot;)+
     theme(axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=0.5)) # adjusting x axis label</code></pre>
-<p><img src="/blogs/blog6_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
-<p>Though there’s an almost comparables mix of education levels of employees across depatment, most of the employees are Bachelor-level educated in all departments. More employees hold Masters in Sales than other departments.</p>
-<pre class="r"><code>ggplot(Enviro,aes(x=department, y=n_percent, # specifying axes and colouring
-                  fill=factor(environment_satisfaction, 
-                              levels=c(&quot;Very High&quot;, &quot;High&quot;, &quot;Medium&quot; , &quot;Low&quot;))))+
- geom_col()+ # generating graph
-labs(title=&quot;Environment Satisfaction by Department at IBM&quot;, # adding title and labels
-       x=&quot;Department&quot;,
-       y=&quot;Percentage Vote&quot;,
-       fill= &quot;Environment Satisfaction&quot;)+
-    theme(axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=0.5)) # adjusting x axis</code></pre>
-<p><img src="/blogs/blog6_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="/blogs/blog6_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>Though there’s an almost comparable mix of education levels of employees across department, most of the employees are Bachelor-level educated in all departments. More employees hold Masters in Sales than other departments. This data maybe slightly surprising at first, as R&amp;D is expected to have the highest proportion of highly skilled employees. However, it may be the case that a large number of employees in R&amp;D are involved in roles such as project management where the a high skill level is not required.</p>
 <pre class="r"><code>Enviro %&gt;% ggplot()+ # creating variable 
   aes(x=environment_satisfaction, # specifying axes and colouring
       y = n_percent, 
@@ -955,7 +938,7 @@ labs(title=&quot;Environment Satisfaction by Department at IBM&quot;, # adding t
        y=&quot;Percentage Vote&quot;,
        fill= &quot;Environment Satisfaction&quot;)+
     theme(axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=0.5)) # adjusting x axis</code></pre>
-<p><img src="/blogs/blog6_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<p><img src="/blogs/blog6_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <p>Around 41% employees in HR seems to be satisfied with the environmental conditions, this seems to be because one of the key roles of the HR department is to keep a positive organisational environment. 31% of Research employees felt very highly satisfied by Environmental conditions, a reason for this could be - R&amp;D is a highly specialised department, therefore the people who join such roles are specifically trained for this and expect what is to come. However, sales guys seems to be divided into comparable groups of employees to have voted for all the categories in the range 20%-30%.</p>
 <p>Post this, it would be interesting to look at how departments perform.</p>
 <pre class="r"><code>ggplot(Perf,aes(x=department, y=n_percent, # specifying axes and colouring

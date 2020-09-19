@@ -23,7 +23,7 @@ library(tidyquant)
 
 The [IBM HR Analytics Employee Attrition & Performance dataset](https://www.kaggle.com/pavansubhasht/ibm-hr-analytics-attrition-dataset) is a fictional data set created by IBM data scientists.  Among other things, the data set includes employees' income, their distance from work, their position in the company, their level of education, etc. A full description can be found on the website.
 
-## Data cleaning and reorganising
+## Loading the data and summary statistics 
 At first, the data set is loaded and summary statistics are provided.
 
 ```{r}
@@ -34,6 +34,8 @@ skim(hr_dataset) # summary statistics
 ```
 
 Data set reveals there are 26 Quantitative and 9 qualitative parameters about employees working at IBM. However, this is not a true picture as there are many rating-based and level-based variables Viz. Education level, Environment satisfaction etc. which have been coded as numeric values and hence a basic data cleaning is necessary. One important observation is that the data has no missing values.
+
+## Data cleaning and reorganising
 
 ```{r}
 
@@ -126,16 +128,6 @@ Work<-hr_cleaned%>% # creating variable
 
 ```{r}
 
-ggplot(Edu,aes(x=department,  # speciyfying axes
-               y=n_percent, 
-               fill=factor(education, levels=c( "Doctor","Master", "Bachelor", "College", "Below College"))))+
- geom_col()+ # generating graph
-labs(title="Education Level by Department at IBM", # adding labels and colouring 
-       x="Department",
-       y="Percentage Education",
-       fill= "Education Level")+
-    theme(axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=0.5)) # adjusting x axis label
-
 ggplot(Edu)+
   aes(x=education, y = n_percent, fill = education)+ # speciyfying axes
   geom_col()+  # generating graph
@@ -148,21 +140,11 @@ ggplot(Edu)+
 
 ```
 
-Though there's an almost comparables mix of education levels of employees across depatment, most of the employees are Bachelor-level educated in all departments. More employees hold Masters in Sales than other departments.
+Though there's an almost comparable mix of education levels of employees across department, most of the employees are Bachelor-level educated in all departments. More employees hold Masters in Sales than other departments. This data maybe slightly surprising at first, as R&D is expected to have the highest proportion of highly skilled employees. However, it may be the case that a large number of employees in R&D are involved in roles such as project management where the a high skill level is not required.  
 
 
 
 ```{r}
-
-ggplot(Enviro,aes(x=department, y=n_percent, # specifying axes and colouring
-                  fill=factor(environment_satisfaction, 
-                              levels=c("Very High", "High", "Medium" , "Low"))))+
- geom_col()+ # generating graph
-labs(title="Environment Satisfaction by Department at IBM", # adding title and labels
-       x="Department",
-       y="Percentage Vote",
-       fill= "Environment Satisfaction")+
-    theme(axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=0.5)) # adjusting x axis
 
 Enviro %>% ggplot()+ # creating variable 
   aes(x=environment_satisfaction, # specifying axes and colouring
