@@ -1,0 +1,284 @@
+---
+date: "2020-09-19"
+description: Checking Out IBM Employees!
+draft: false
+image: hr1.jpg
+keywords: ""
+slug: blog6
+title: IBM HR Analytics 
+---
+
+```{r load-libraries, warning=FALSE, message=FALSE, echo=FALSE}
+library(tidyverse)  # Load ggplot2, dplyr, and all the other tidyverse packages
+library(mosaic)
+library(ggthemes)
+library(lubridate)
+library(fivethirtyeight)
+library(here)
+library(skimr)
+library(janitor)
+library(vroom)
+library(tidyquant)
+```
+
+The [IBM HR Analytics Employee Attrition & Performance dataset](https://www.kaggle.com/pavansubhasht/ibm-hr-analytics-attrition-dataset) is a fictional data set created by IBM data scientists.  Among other things, the data set includes employees' income, their distance from work, their position in the company, their level of education, etc. A full description can be found on the website.
+
+## Data cleaning and reorganising
+At first, the data set is loaded and summary statistics are provided.
+
+```{r}
+
+hr_dataset <- read_csv(here::here("data", "datasets_1067_1925_WA_Fn-UseC_-HR-Employee-Attrition.csv")) # loading data set
+skim(hr_dataset) # summary statistics
+
+```
+
+Data set reveals there are 26 Quantitative and 9 qualitative parameters about employees working at IBM. However, this is not a true picture as there are many rating-based and level-based variables Viz. Education level, Environment satisfaction etc. which have been coded as numeric values and hence a basic data cleaning is necessary. One important observation is that the data has no missing values.
+
+```{r}
+
+# Basic Data Cleaning and re-coding of levels
+
+hr_cleaned <- hr_dataset %>% 
+  clean_names() %>% 
+  mutate(
+    education = case_when(
+      education == 1 ~ "Below College",
+      education == 2 ~ "College",
+      education == 3 ~ "Bachelor",
+      education == 4 ~ "Master",
+      education == 5 ~ "Doctor"
+    ),
+    environment_satisfaction = case_when(
+      environment_satisfaction == 1 ~ "Low",
+      environment_satisfaction == 2 ~ "Medium",
+      environment_satisfaction == 3 ~ "High",
+      environment_satisfaction == 4 ~ "Very High"
+    ),
+    job_satisfaction = case_when(
+      job_satisfaction == 1 ~ "Low",
+      job_satisfaction == 2 ~ "Medium",
+      job_satisfaction == 3 ~ "High",
+      job_satisfaction == 4 ~ "Very High"
+    ),
+    performance_rating = case_when(
+      performance_rating == 1 ~ "Low",
+      performance_rating == 2 ~ "Good",
+      performance_rating == 3 ~ "Excellent",
+      performance_rating == 4 ~ "Outstanding"
+    ),
+    work_life_balance = case_when(
+      work_life_balance == 1 ~ "Bad",
+      work_life_balance == 2 ~ "Good",
+      work_life_balance == 3 ~ "Better",
+      work_life_balance == 4 ~ "Best"
+    )
+  ) %>% 
+  select(age, attrition, daily_rate, department,
+         distance_from_home, education,
+         gender, job_role,environment_satisfaction,
+         job_satisfaction, marital_status,
+         monthly_income, num_companies_worked, percent_salary_hike,
+         performance_rating, total_working_years,
+         work_life_balance, years_at_company,
+         years_since_last_promotion,)
+
+
+skim(hr_cleaned) # summary statistics
+
+```
+
+Post data cleaning, we are left with 19 attributes in total. Of which - 9 are Numeric and rest are qualitative.
+
+
+## Exploratory Data Analysis
+
+Creating new subsets of hr_cleaned for later analyses on factors like Job Satisfaction, Education level, Environment satisfaction, Performance ratings and Work satisfaction among employees across departments.
+ 
+```{r}
+JobSat<-hr_cleaned%>% # creating variable
+  group_by(department)%>% # grouping by department
+  count(job_satisfaction)%>% # counting variable enclosed by grouped variable 
+  mutate(n_percent=n/sum(n)) # adding a proportion 
+
+Edu<-hr_cleaned%>% # creating variable
+  group_by(department)%>% # grouping by department
+  count(education)%>% # counting variable enclosed by grouped variable 
+  mutate(n_percent=n/sum(n)) # adding a proportion
+
+Enviro<-hr_cleaned%>% # creating variable
+  group_by(department)%>% # grouping by department
+  count(environment_satisfaction)%>% # counting variable enclosed by grouped variable
+  mutate(n_percent=n/sum(n)) # adding a proportion
+
+Perf<-hr_cleaned%>% # creating variable
+  group_by(department)%>% # grouping by department
+  count(performance_rating)%>% # counting variable enclosed by grouped variable
+  mutate(n_percent=n/sum(n)) # adding a proportion
+
+Work<-hr_cleaned%>% # creating variable
+  group_by(department)%>% # grouping by department
+  count(work_life_balance)%>% # counting variable enclosed by grouped variable
+  mutate(n_percent=n/sum(n)) # adding a proportion
+
+```
+
+
+```{r}
+
+ggplot(Edu,aes(x=department,  # speciyfying axes
+               y=n_percent, 
+               fill=factor(education, levels=c( "Doctor","Master", "Bachelor", "College", "Below College"))))+
+ geom_col()+ # generating graph
+labs(title="Education Level by Department at IBM", # adding labels and colouring 
+       x="Department",
+       y="Percentage Education",
+       fill= "Education Level")+
+    theme(axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=0.5)) # adjusting x axis label
+
+ggplot(Edu)+
+  aes(x=education, y = n_percent, fill = education)+ # speciyfying axes
+  geom_col()+  # generating graph
+  facet_grid(~department)+ # faceting by department
+  labs(title="Education Level by Department at IBM", # adding labels and colouring 
+       x="Department",
+       y="Percentage Education",
+       fill= "Education Level")+
+    theme(axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=0.5)) # adjusting x axis label
+
+```
+
+Though there's an almost comparables mix of education levels of employees across depatment, most of the employees are Bachelor-level educated in all departments. More employees hold Masters in Sales than other departments.
+
+
+
+```{r}
+
+ggplot(Enviro,aes(x=department, y=n_percent, # specifying axes and colouring
+                  fill=factor(environment_satisfaction, 
+                              levels=c("Very High", "High", "Medium" , "Low"))))+
+ geom_col()+ # generating graph
+labs(title="Environment Satisfaction by Department at IBM", # adding title and labels
+       x="Department",
+       y="Percentage Vote",
+       fill= "Environment Satisfaction")+
+    theme(axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=0.5)) # adjusting x axis
+
+Enviro %>% ggplot()+ # creating variable 
+  aes(x=environment_satisfaction, # specifying axes and colouring
+      y = n_percent, 
+      fill=environment_satisfaction)+
+  geom_col()+ # generating graph
+  facet_grid(~department)+ # faceting by department
+labs(title="Environment Satisfaction by Department at IBM", # adding title and labels
+       x="Department",
+       y="Percentage Vote",
+       fill= "Environment Satisfaction")+
+    theme(axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=0.5)) # adjusting x axis
+```
+
+Around 41% employees in HR seems to be satisfied with the environmental conditions, this seems to be because one of the key roles of the HR department is to keep a positive organisational environment. 31% of Research employees felt very highly satisfied by Environmental conditions, a reason for this could be - R&D is a highly specialised department, therefore the people who join such roles are specifically trained for this and expect what is to come. However, sales guys seems to be divided into comparable groups of employees to have voted for all the categories in the range 20%-30%.
+
+Post this, it would be interesting to look at how departments perform. 
+
+
+```{r}
+ggplot(Perf,aes(x=department, y=n_percent, # specifying axes and colouring
+                fill=factor(performance_rating, 
+                            levels=c("Outstanding", "Excellent", "Good" , "Low"))))+
+ geom_col()+ # generating graph
+ labs(title="Performance Rating by Department at IBM",  # adding title and labels
+       x="Department",
+       y="Percentage Vote",
+       fill= "Performance Rating")+
+    theme(axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=0.5)) # adjusting x axis
+
+```
+
+Performance ratings seems to be equally distributed across employees across departments. This is an interesting statistic given the mixed environmental satisfaction response. Despite such a positive performance rating, on average one in five employees are dissatisfied with the environmental conditions. Further, an attrition rate analysis seems to be logical.   
+
+
+## Attrition Rates
+
+```{r}
+overalll_attrition <- hr_cleaned %>% # creating variable
+  group_by(attrition) %>% # grouping by attrition
+  summarise(count = n()) %>% # counting variable
+  mutate(overall_attrition = paste(round(count*100/sum(count),0),"%",sep="")) %>% # adding a variable
+  filter(attrition=="Yes") %>% # filtering 
+  select(overall_attrition) # selecting overall attrition
+
+hr_cleaned %>% 
+  group_by(attrition, department) %>% # grouping by variables
+  summarise(count=n()) %>% # counting by grouped variables
+  group_by(department) %>% # grouping by department
+  mutate(attrition_rate=paste(round(count*100/sum(count),0),"%",sep="")) %>% # adding a variable and rounding
+  filter(attrition=="Yes") %>% # filtering
+  select(department, attrition_rate) %>% # selecting certain variables
+  ungroup() %>% # ungrouping previously grouped variables
+  add_row(department = 'Overall' , attrition_rate = overalll_attrition[[1]]) # adding an additional row with a variable
+
+
+hr_cleaned %>% 
+  group_by(attrition, department) %>% # grouping by variables
+  summarise(count=n()) %>% # counting by grouped variables
+  group_by(department) %>% # grouping by department
+  mutate(attrition_rate=paste(round(count*100/sum(count),0),"%",sep="")) %>% # adding a variable and rounding
+  filter(attrition=="Yes") %>% # filtering
+  select(department, attrition_rate) %>% ungroup() %>% # selecting certain variables
+  add_row(department = 'Overall' , attrition_rate = overalll_attrition[[1]]) %>% # adding an additional row with a variable 
+  mutate(per_value = as.numeric(substr(attrition_rate,1,2))) %>% # creating a variable
+  ggplot()+
+  aes(x = department , y =per_value)+ # specifying axes
+  geom_col(fill="#8b9dc3")+ # generating graph
+  theme_bw()+ # adding a black and white theme
+  labs(title = "Attrition Rates at IBM", x="Department", y="Attrition Rate (%)") # adding labels and title 
+
+```
+
+The overall attrition seems to be around 16%. This is in line with our previous analysis which indicated that around 20% employees felt dissatisfied with the environmental conditions. Over 20% of Sales employees attrite. and R&D has minimum attrition. This data is logical as research and development is a proprietary role and IBM must have put in place non-compete policies for such employees. On the other hand sales is a highly competitive fast paced role and thus high attrition is to be expected.     
+
+Subsequently, distributions of age, years at IBM, monthly income and years since last promotion have been analysed.
+
+## Distributions
+
+```{r}
+ggplot(hr_cleaned,aes(x=age))+  #specifying x axis
+  geom_density(fill="#8b9dc3")+ #generating density plot
+  facet_wrap(~department) #facet by department
+
+hr_cleaned %>% 
+  group_by(department) %>%  #grouped by department
+  summarize(mean_age=round(mean(age),0), #calculating mean_age and rounded it to 0 decimal place
+            median_age = round(median(age),0)) #calculating median age
+```
+
+The age of employees working in different departments seems to be fairly normally distributed with a mean age of around 37 Yrs. Median age is about 36 Yrs (very close to the average suggesting minimal extreme values). The bump to the right extreme of these curves represent perhaps the senior management  age group as they are expected to have more experience and age.
+
+```{r}
+ggplot(hr_cleaned,aes(x=years_at_company))+  #specifying x axes
+  geom_density(fill="#8b9dc3") +   #generating density plot
+  labs (x="Years at Company") + #adding x label
+  facet_wrap(~department) #facet by department
+```
+
+As for years at company, across departments the distribution seems to be very right skewed suggesting most employees leave in around 15 years. 
+
+```{r}
+ggplot(hr_cleaned,aes(x=monthly_income)) +  #specifying x  axes
+  geom_density(fill="#8b9dc3") +  #generating density plot
+  labs(x="Monthly Income")+ #adding x label
+  facet_wrap(~department) #facet by department
+```
+
+As per intuition, monthly income is right skewed with avg. monthly income of R&D folks being on higher side - given the nature of their job role and the experience required. Most of the Sales people draw around USD 55,00 - 6,00 monthly. HR seems to be earning the least on a relative scale. 
+
+```{r}
+ggplot(hr_cleaned,aes(x=years_since_last_promotion))+ #specifying x axes
+  geom_density(fill="#8b9dc3") + #generating density plot
+  labs(x="Years Since Last Promotion")+  #adding x label
+  facet_wrap(~department) #facet by department
+```
+
+
+Distribution of Years since last promoted indicates that HR and Sales employees spend more time between promotions than R&D folks.

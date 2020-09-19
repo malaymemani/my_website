@@ -1,5 +1,5 @@
 # Site settings
-baseURL = "http://example.org/"
+baseURL = "https://malay-memani.netlify.app/"
 languageCode = "en-us"
 title = "Portfolio website for Kostis Christodoulou"
 theme = "forty"
@@ -19,7 +19,7 @@ disqusShortname = ""
   # CSS class.
 
   # Provide your metadata here.
-  name = "Malay R. Memani"
+  name = "Malay Memani"
   description = "I was born and brought up in New Delhi, India and completed my schooling from The Shri Ram School. Post which, I headed to the UK for my undergraduate studies and graduated with honours in Economics and Management from The University of St Andrews. After which, I returned to India and worked for a Private Equity Fund, Lighthouse Funds in Mumbai. Subsequently, I got admitted to London Business School for a Masters in Analytics and Management."
 
   # Link custom assets relative to /static
@@ -37,7 +37,7 @@ disqusShortname = ""
 
   # Navigation Section
   [params.navigation]
-    title = "Malay R. Memani"
+    title = "Malay Memani"
     subtitle = "Mr"
     menu = "Menu"
     # Optional logo as brand stored in img/
@@ -51,13 +51,13 @@ disqusShortname = ""
       name = "Blogs"
       url = "blogs"
 
-    [[params.navigation.links]]
-      name = "Generic Blog"
-      url = "blogs/ipsum"
+    #[[params.navigation.links]]
+    #  name = "Generic Blog"
+    # url = "blogs/ipsum"
 
-    [[params.navigation.links]]
-      name = "Elements"
-      url = "elements.html"
+  #  [[params.navigation.links]]
+   #   name = "Elements"
+    #  url = "elements.html"
 
     # Add custom links here by uncommenting code below. To remove links just delete
     # the [[params.navigation.links]] map associated with that link. Copy and paste
@@ -66,15 +66,15 @@ disqusShortname = ""
     #    name = "NameOfLink"
     #    url = "UrlOfLink"
 
-    # Button Style 1
+    #Button Style 1
     [[params.navigation.button1]]
-      name = "Get Started"
+      name = "My Projects"
       url = "blogs"
 
     # Button Style 2
-    [[params.navigation.button2]]
-      name = "Log In"
-      url = "#"
+   # [[params.navigation.button2]]
+    #  name = "Log In"
+     # url = "#"
 
 
   # Banner section
@@ -83,13 +83,9 @@ disqusShortname = ""
     # the 'static/img' folder.
 
 
-    title = "Hi, my name is Malay R. Memani"
+    title = "Hi, my name is Malay Memani"
     subtitle = "LBS | St Andrews | Lighthouse"
 
-
-
-
-  
 buttonText = "Get Started"
 
 
@@ -99,40 +95,40 @@ buttonText = "Get Started"
     # Display your showcases here.
     
     [[params.tiles.showcase]]
-      title = "Aliquam"
-      subtitle = "Ipsum Dolor Sit Amet"
-      image = "pic01.jpg"
-      url = "blogs/aliquam"
+      title = "IBM HR Analytics"
+      subtitle = "A deepdive into IBM employees!"
+      image = "hr1.jpg"
+      url = "blogs/blog6"
 
     [[params.tiles.showcase]]
-      title = "Tempus"
-      subtitle = "Feugiat Amet Tempus"
-      image = "pic02.jpg"
-      url = "blogs/tempus"
+      title = "CDC COVID-19 Public Use Data "
+      subtitle = "Exploring COVID in USA!"
+      image = "covid.jpg"
+      url = "blogs/blog7"
 
     [[params.tiles.showcase]]
-      title = "Magna"
-      subtitle = "Lorem Etiam Nullam"
-      image = "pic03.jpg"
-      url = "blogs/magna"
+      title = "Pay Discrimination at Omega"
+      subtitle = "Are men and women paid differently at Omega?"
+      image = "pay_discrimiation.jpg"
+      url = "blogs/blog8"
 
     [[params.tiles.showcase]]
-      title = "Ipsum"
-      subtitle = "Nisl Sed Aliquam"
-      image = "pic04.jpg"
+      title = "Project 4"
+      subtitle = "Coming Soon"
+      image = ""
       url = "blogs/ipsum"
 
-    [[params.tiles.showcase]]
-      title = "Consequat"
-      subtitle = "Ipsum Dolor Sit Amet"
-      image = "pic05.jpg"
-      url = "blogs/ipsum"
+   # [[params.tiles.showcase]]
+  #    title = "Consequat"
+    #  subtitle = "Ipsum Dolor Sit Amet"
+     # image = "pic05.jpg"
+    #  url = "blogs/ipsum"
 
-    [[params.tiles.showcase]]
-      title = "Etiam"
-      subtitle = "Feugiat Amet Tempus"
-      image = "pic06.jpg"
-      url = "blogs/ipsum"
+    #[[params.tiles.showcase]]
+     # title = "Etiam"
+      #subtitle = "Feugiat Amet Tempus"
+      #image = "pic06.jpg"
+      #url = "blogs/ipsum"
     # You can make more showcases by copy and pasting the code above
 
   [params.blog]
@@ -144,15 +140,15 @@ buttonText = "Get Started"
 
   # Section Type Two
   [params.two]
-    enable = true
-    title = "Massa libero"
-    subtitle = """Nullam et orci eu lorem consequat tincidunt vivamus et sagittis libero. 
-    Mauris aliquet magna magna sed nunc rhoncus pharetra. 
-    Pellentesque condimentum sem. In efficitur ligula tate urna. Maecenas laoreet massa vel lacinia pellentesque lorem ipsum dolor. 
-    Nullam et orci eu lorem consequat tincidunt. Vivamus et sagittis libero.
-    Mauris aliquet magna magna sed nunc rhoncus amet pharetra et feugiat tempus."""
-    buttonText = "Get Started"
-    url = "blogs"
+  #  enable = true
+   # title = "Massa libero"
+    #subtitle = """Nullam et orci eu lorem consequat tincidunt vivamus et sagittis libero. 
+    #Mauris aliquet magna magna sed nunc rhoncus pharetra. 
+    #Pellentesque condimentum sem. In efficitur ligula tate urna. Maecenas laoreet massa vel lacinia pellentesque lorem ipsum dolor. 
+    #Nullam et orci eu lorem consequat tincidunt. Vivamus et sagittis libero.
+    #Mauris aliquet magna magna sed nunc rhoncus amet pharetra et feugiat tempus."""
+    #buttonText = "Get Started"
+    #url = "blogs"
 
 
   # Contact section
@@ -183,13 +179,13 @@ buttonText = "Get Started"
 
     [[params.contact.phone]]
     title = "Phone"
-    phone = "+919910095413"
+    phone = "+91 011 29554591"
 
     [[params.contact.address]]
     title = "Address"
-    street = "W7/21, Western Avenue, Sainik Farms"
-    city = "New Delhi"
-    country = "India"
+    street = "London Business School, Regent's Park"
+    city = "London - NW1 4SA"
+    country = "United Kingdom"
 
   # Footer section
   [params.footer]
@@ -197,29 +193,29 @@ buttonText = "Get Started"
     copyright = "Company Name"
 
     # Uses font awesome icons
-    [[params.footer.social]]
-      icon = "fa-twitter"
-      url= "https://www.twitter.com"
-      label = "Twitter"
+    #[[params.footer.social]]
+      #icon = "fa-twitter"
+      #url= "https://www.twitter.com"
+     # label = "Twitter"
 
-    [[params.footer.social]]
-      icon = "fa-facebook"
-      url= "https://www.facebook.com"
-      label = "Facebook"
+  #  [[params.footer.social]]
+   #   icon = "fa-facebook"
+    #  url= "https://www.facebook.com"
+     # label = "Facebook"
 
-    [[params.footer.social]]
-      icon = "fa-instagram"
-      url= "https://www.instagram.com"
-      label = "Instagram"
+   # [[params.footer.social]]
+    #  icon = "fa-instagram"
+     # url= "https://www.instagram.com"
+      #label = "Instagram"
     
     [[params.footer.social]]
       icon = "fa-github"
-      url= "https://www.github.com"
+      url= "https://github.com/malaymemani"
       label = "GitHub"
 
     [[params.footer.social]]
       icon = "fa-linkedin"
-      url= "https://www.linkedin.com"
+      url= "https://in.linkedin.com/in/malay-memani-875022109"
       label = "LinkedIn"
 
     [[params.footer.quicklinks]]

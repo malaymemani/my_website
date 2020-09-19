@@ -1,0 +1,366 @@
+---
+date: "2020-09-19"
+description: 
+draft: false
+image: covid.jpg
+keywords: ""
+slug: blog7
+title: CDC COVID-19 Public Use Data 
+---
+
+
+
+<p><a href="https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data/vbim-akqf">CDC Covid-19 Case Surveillance Data</a>. There are well over 3 million entries of individual, de-identified patient data.</p>
+<div id="loading-the-data-set-and-summary-statistics" class="section level2">
+<h2>Loading the data set and summary statistics</h2>
+<p>Below, the data set has been loaded and summary statistics have been provided.</p>
+<pre class="r"><code># URL link to CDC to download data
+url &lt;- &quot;https://data.cdc.gov/api/views/vbim-akqf/rows.csv?accessType=DOWNLOAD&quot;
+
+covid_data &lt;- vroom(url)%&gt;% # Downloading data 
+  clean_names() # cleaning data</code></pre>
+<pre><code>## Rows: 3,662,325
+## Columns: 11
+## Delimiter: &quot;,&quot;
+## chr  [8]: current_status, sex, age_group, Race and ethnicity (combined), hosp_yn, icu_yn...
+## date [3]: cdc_report_dt, pos_spec_dt, onset_dt
+## 
+## Use `spec()` to retrieve the guessed column specification
+## Pass a specification to the `col_types` argument to quiet this message</code></pre>
+<pre class="r"><code>skim(covid_data) # generating summary statistics</code></pre>
+<table>
+<caption><span id="tab:unnamed-chunk-1">Table 1: </span>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td align="left">Name</td>
+<td align="left">covid_data</td>
+</tr>
+<tr class="even">
+<td align="left">Number of rows</td>
+<td align="left">3662325</td>
+</tr>
+<tr class="odd">
+<td align="left">Number of columns</td>
+<td align="left">11</td>
+</tr>
+<tr class="even">
+<td align="left">_______________________</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Column type frequency:</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">character</td>
+<td align="left">8</td>
+</tr>
+<tr class="odd">
+<td align="left">Date</td>
+<td align="left">3</td>
+</tr>
+<tr class="even">
+<td align="left">________________________</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Group variables</td>
+<td align="left">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: character</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">min</th>
+<th align="right">max</th>
+<th align="right">empty</th>
+<th align="right">n_unique</th>
+<th align="right">whitespace</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">current_status</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">13</td>
+<td align="right">25</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">sex</td>
+<td align="right">18</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">7</td>
+<td align="right">0</td>
+<td align="right">5</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">age_group</td>
+<td align="right">94</td>
+<td align="right">1</td>
+<td align="right">7</td>
+<td align="right">13</td>
+<td align="right">0</td>
+<td align="right">10</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">race_and_ethnicity_combined</td>
+<td align="right">6</td>
+<td align="right">1</td>
+<td align="right">7</td>
+<td align="right">52</td>
+<td align="right">0</td>
+<td align="right">8</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">hosp_yn</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">7</td>
+<td align="right">0</td>
+<td align="right">4</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">icu_yn</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">7</td>
+<td align="right">0</td>
+<td align="right">4</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">death_yn</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">7</td>
+<td align="right">0</td>
+<td align="right">4</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">medcond_yn</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">7</td>
+<td align="right">0</td>
+<td align="right">4</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: Date</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="left">min</th>
+<th align="left">max</th>
+<th align="left">median</th>
+<th align="right">n_unique</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">cdc_report_dt</td>
+<td align="right">0</td>
+<td align="right">1.00</td>
+<td align="left">2020-01-01</td>
+<td align="left">2020-08-16</td>
+<td align="left">2020-06-23</td>
+<td align="right">225</td>
+</tr>
+<tr class="even">
+<td align="left">pos_spec_dt</td>
+<td align="right">2331742</td>
+<td align="right">0.36</td>
+<td align="left">2020-01-01</td>
+<td align="left">2020-08-28</td>
+<td align="left">2020-05-16</td>
+<td align="right">205</td>
+</tr>
+<tr class="odd">
+<td align="left">onset_dt</td>
+<td align="right">1772698</td>
+<td align="right">0.52</td>
+<td align="left">2020-01-01</td>
+<td align="left">2020-08-30</td>
+<td align="left">2020-06-06</td>
+<td align="right">243</td>
+</tr>
+</tbody>
+</table>
+<p>The summary statistics reveal certain variables have missing values and needs to be cleaned.</p>
+</div>
+<div id="exploratory-data-analysis-co-morbidities" class="section level2">
+<h2>Exploratory Data Analysis: Co-Morbidities</h2>
+<p>Given the data set, it would be interesting to explore the death rate by age group and gender with people who had co-morbidities or not.</p>
+<pre class="r"><code>covid_data_deathrate1 &lt;- covid_data %&gt;% # creating a new variable
+  filter(!(death_yn %in%c(&quot;Missing&quot;,&quot;Unknown&quot;)), # filtering for missing and unknown in various variables
+         !(medcond_yn %in%c(&quot;Missing&quot;,&quot;Unknown&quot;)),
+         !(is.na(age_group)), 
+         !(age_group %in%c(&quot;Missing&quot;,&quot;Unknown&quot;)),
+         !(is.na(sex)), 
+         !(sex %in%c(&quot;Missing&quot;,&quot;Unknown&quot;))) %&gt;% 
+  
+ group_by (age_group, sex, medcond_yn, death_yn) %&gt;% # grouping by various variables
+  count(death_yn)  %&gt;% # counting death_yn by the grouped variables
+  group_by (age_group, sex, medcond_yn) %&gt;% # grouping by various variables
+  mutate(death_rate = n*100/sum(n)) %&gt;% # adding death rate
+  filter(death_yn==&quot;Yes&quot;) %&gt;% # filtering for &quot;Yes&quot; values
+  mutate(comorb = ifelse(medcond_yn==&quot;No&quot;,&quot;Without Comorbidities&quot;,&quot;With Comorbidities&quot;), # adding comorb
+         death_rate = round(death_rate,1)) # rounding death rate by 1 decimal point</code></pre>
+<pre><code>## Warning: `count_()` is deprecated as of dplyr 0.7.0.
+## Please use `count()` instead.
+## See vignette(&#39;programming&#39;) for more help
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.</code></pre>
+<pre class="r"><code>covid_data_deathrate1 %&gt;%  
+  ggplot(aes(x= age_group, y = death_rate))+ # specifying the axes
+  geom_col(fill=&quot;#8b9dc3&quot;)+ # generating a column graph and colouring the columns
+  coord_flip()+ # flipping the axes
+  facet_grid(col=vars(sex),row=vars(comorb))+ # laying out panels in a grid
+  theme(axis.text.x = element_text(angle = 30)) + # tilting the x axis labels by 30 degrees
+  geom_text(aes(label=death_rate), # labeling the columns
+            position=position_dodge(width=0.9), # adjusting the position of column labels
+            hjust = -0.25)  + 
+  theme_bw()+ # adding a black and white theme
+  labs(title=&quot;Covid death % by age group, sex and presence of co-morbidities&quot;,
+       x=&quot;&quot;,y=&quot;&quot;, caption=&quot;Source:CDC&quot;) # adding a title and source caption </code></pre>
+<p><img src="/blogs/blog7_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>Clearly in the US, people with co-morbities are at a higher risk of dying regardless of gender. Having said that, the graph above demonstrates that males are at a higher risk of dying via the virus in any category and age group. Also, on average, it can be seen that the lowest death rate across categories is between the ages of 10-30 and increases in a linear fashion post 30. This means that the death rate for infants is marginally higher than teenagers and youngsters in their 20’s.</p>
+</div>
+<div id="confidence-intervals-co-morbidities" class="section level2">
+<h2>Confidence Intervals: Co-Morbidities</h2>
+<p>To analyse the effects of co-morbidities with death rates in a gender neutral manner, 95% confidence intervals have been created below. If the intervals overlap a deeper study with hypothesis testing would have to be done.</p>
+<pre class="r"><code>#Calculating CI for with co-morbidities
+covid_data_ci_yes &lt;- covid_data %&gt;% # creating a variable
+  filter(!(death_yn %in%c(&quot;Missing&quot;,&quot;Unknown&quot;)), # filtering for missing and unknown in various variables
+         !(medcond_yn %in%c(&quot;Missing&quot;,&quot;Unknown&quot;)),
+         !(is.na(age_group)), 
+         !(age_group %in%c(&quot;Missing&quot;,&quot;Unknown&quot;)),
+         !(is.na(sex)), 
+         !(sex %in%c(&quot;Missing&quot;,&quot;Unknown&quot;))) %&gt;% 
+
+  group_by (medcond_yn, death_yn) %&gt;% # grouping by variables
+  count(death_yn)  %&gt;% # counting death_yn by the grouped variables 
+  group_by (medcond_yn) %&gt;% # grouping by medcond_yn
+  filter(medcond_yn == &#39;Yes&#39;) %&gt;% # filtering  
+  mutate(death_rate = n*100/sum(n), # adding death rate
+         total = sum(n)) %&gt;% # summing grouped variable
+  filter(death_yn==&quot;Yes&quot;) %&gt;% # filtering 
+  mutate( se = sqrt((death_rate*(1-death_rate/100)/100)/total), # calculating standard error
+         t_critical=qt(0.975, total -1), # calculating T value 
+         margin_of_error_WithComorbidities=t_critical*se, # calculating margin of error 
+        WithComorbidities_low=death_rate-margin_of_error_WithComorbidities, # calculating lower CI
+        WithComorbidities_high=death_rate+margin_of_error_WithComorbidities) # calculating upper CI
+
+#CI for Deathrate with comorbidities is: 
+paste(&quot;CI for Deathrate with comobidities is [&quot; , covid_data_ci_yes$WithComorbidities_low, &#39; , &#39;, covid_data_ci_yes$WithComorbidities_high,&quot;]&quot;,sep = &#39;&#39;) # printing CI </code></pre>
+<pre><code>## [1] &quot;CI for Deathrate with comobidities is [19.1202494465034 , 19.1229571087697]&quot;</code></pre>
+<pre class="r"><code>#Calculating CI for no comorbidities
+covid_data_ci_no &lt;- covid_data %&gt;% # creating a variable
+  filter(!(death_yn %in%c(&quot;Missing&quot;,&quot;Unknown&quot;)), # filtering for missing and unknown in various variables
+         !(medcond_yn %in%c(&quot;Missing&quot;,&quot;Unknown&quot;)),
+         !(is.na(age_group)), 
+         !(age_group %in%c(&quot;Missing&quot;,&quot;Unknown&quot;)),
+         !(is.na(sex)), 
+         !(sex %in%c(&quot;Missing&quot;,&quot;Unknown&quot;))) %&gt;%  
+
+  group_by (medcond_yn, death_yn) %&gt;% # grouping by variables
+  count(death_yn)  %&gt;% # counting death_yn by the grouped variables
+  group_by (medcond_yn) %&gt;% # grouping by medcond_yn
+  filter(medcond_yn == &#39;No&#39;) %&gt;% # filtering 
+  mutate(death_rate = n*100/sum(n), # adding death rate
+         total = sum(n)) %&gt;% # summing grouped variable
+  filter(death_yn==&quot;Yes&quot;) %&gt;% # filtering 
+  mutate( se = sqrt((death_rate*(1-death_rate/100)/100)/total), # calculating standard error
+         t_critical=qt(0.975, total -1), # calculating T value
+         margin_of_error_WithoutComorbidities=t_critical*se, # calculating margin of error 
+        WithoutComorbidities_low=death_rate-margin_of_error_WithoutComorbidities, # calculating lower CI
+        WithoutComorbidities_high=death_rate+margin_of_error_WithoutComorbidities) # calculating upper CI
+#CI for Deathrate without comobidities is: 
+paste(&quot;CI for Deathrate with comobidities is [&quot; , covid_data_ci_no$WithoutComorbidities_low, &#39; , &#39;, covid_data_ci_no$WithoutComorbidities_high,&quot;]&quot;,sep = &#39;&#39;) # printing CI</code></pre>
+<pre><code>## [1] &quot;CI for Deathrate with comobidities is [0.776648053619993 , 0.777364961564388]&quot;</code></pre>
+<p>As can be seen from the confidence intervals above that the death rates for patients with and without co-morbidities are very different with death rates for patients with co-morbidities significantly higher. Therefore, no hypothesis testing is required and it can be said with 95% confidence that the death rate among Covid patients with prior illnesses is greater given the sample. Also, another observation is that the interval bands for both are very tight - this is because the number of observations in our sample are very high.</p>
+</div>
+<div id="exploratory-data-analysis-admission-into-icu" class="section level2">
+<h2>Exploratory Data Analysis: Admission into ICU</h2>
+<p>Given the data set, another aspect to explore would be the death rate by gender and age group with admission into ICU. This would be a good way to see if the difference in death rates amongst people with serious symptoms or no/mild symptoms is significant or not.</p>
+<p><img src="/blogs/blog7_files/figure-html/covid_challenge_2-1.png" width="100%" /></p>
+<p>As can be seen from the graph above, the covid death rate is clearly greater for people with acute symptoms for every age group and gender. As was with co-morbidities, the death rate amongst males is higher than females across the board. It can also be seen that the lowest death rate observed on average within patients who were admitted in the ICU is infants as opposed to people with mild or no symptoms where the average death rate is lowest amongst teenagers and people in their 20’s. The death rates increase in a fairly linear manner across age groups with the highest death rate being in the 80+ category.</p>
+</div>
+<div id="confidence-intervals-admission-into-icu" class="section level2">
+<h2>Confidence Intervals: Admission into ICU</h2>
+<p>To look at the difference of death rate with patients admitted in ICU (acute symptoms) as opposed patients not admitted (mild/no symptoms) in a gender neutral manner, 95% confidence intervals have been created below. If the intervals overlap a deeper study with hypothesis testing would have to be done.</p>
+<pre class="r"><code>#Calculating CI for in ICU
+covid_data_ci_yes.icu &lt;- covid_data %&gt;% # creating a variable
+  filter(!(death_yn %in%c(&quot;Missing&quot;,&quot;Unknown&quot;)), # filtering for missing and unknown in various variables
+         !(icu_yn %in%c(&quot;Missing&quot;,&quot;Unknown&quot;)),
+         !(is.na(age_group)), 
+         !(age_group %in%c(&quot;Missing&quot;,&quot;Unknown&quot;)),
+         !(is.na(sex)), 
+         !(sex %in%c(&quot;Missing&quot;,&quot;Unknown&quot;))) %&gt;% 
+
+  group_by (icu_yn, death_yn) %&gt;% # grouping by variables
+  count(death_yn)  %&gt;% # counting death_yn by the grouped variables 
+  group_by (icu_yn) %&gt;%  # grouping by icu_yn 
+  filter(icu_yn == &#39;Yes&#39;) %&gt;% # filtering
+  mutate(death_rate = n*100/sum(n),# adding death rate
+         total = sum(n)) %&gt;% # summing grouped variable
+  filter(death_yn==&quot;Yes&quot;) %&gt;% # filtering
+  mutate( se = sqrt((death_rate*(1-death_rate/100)/100)/total), # calculating standard error
+         t_critical=qt(0.975, total -1), # calculating T value
+         margin_of_error_in_icu=t_critical*se, # calculating margin of error
+        inicu_low=death_rate-margin_of_error_in_icu, # calculating lower CI
+        inicu_high=death_rate+margin_of_error_in_icu) # calculating upper CI 
+
+#CI for Deathrate with comobidities is: 
+paste(&quot;CI for Deathrate&#39;s for people admitted in ICU is [&quot; , covid_data_ci_yes.icu$inicu_low, &#39; , &#39;, covid_data_ci_yes.icu$inicu_high,&quot;]&quot;,sep = &#39;&#39;) # printing CI</code></pre>
+<pre><code>## [1] &quot;CI for Deathrate&#39;s for people admitted in ICU is [56.5096238799067 , 56.5201300220048]&quot;</code></pre>
+<pre class="r"><code>#Calculating CI for not in ICU
+covid_data_ci_no.icu &lt;- covid_data %&gt;% # creating a variable 
+  filter(!(death_yn %in%c(&quot;Missing&quot;,&quot;Unknown&quot;)), # filtering for missing and unknown in various variables
+         !(icu_yn %in%c(&quot;Missing&quot;,&quot;Unknown&quot;)),
+         !(is.na(age_group)), 
+         !(age_group %in%c(&quot;Missing&quot;,&quot;Unknown&quot;)),
+         !(is.na(sex)), 
+         !(sex %in%c(&quot;Missing&quot;,&quot;Unknown&quot;))) %&gt;% 
+
+  group_by (icu_yn, death_yn) %&gt;% # grouping by variables
+  count(death_yn)  %&gt;% # counting death_yn by the grouped variables
+  group_by (icu_yn) %&gt;% # grouping by icu_yn
+  filter(icu_yn == &#39;No&#39;) %&gt;% # filtering 
+  mutate(death_rate = n*100/sum(n),# adding death rate
+         total = sum(n)) %&gt;% # summing grouped variable
+  filter(death_yn==&quot;No&quot;) %&gt;% # filtering
+  mutate( se = sqrt((death_rate*(1-death_rate/100)/100)/total), # calculating standard error
+         t_critical=qt(0.975, total -1), # calculating T value
+         margin_of_error_not_in_icu=t_critical*se, # calculating margin of error 
+        notinicu_low=death_rate-margin_of_error_not_in_icu, # calculating lower CI
+        notinicu_high=death_rate+margin_of_error_not_in_icu) # calculating upper CI
+
+#CI for Deathrate with comobidities is: 
+paste(&quot;CI for Deathrate&#39;s for people not admitted in ICU is [&quot; , covid_data_ci_no.icu$notinicu_low, &#39; , &#39;, covid_data_ci_no.icu$notinicu_high,&quot;]&quot;,sep = &#39;&#39;) # printing CI</code></pre>
+<pre><code>## [1] &quot;CI for Deathrate&#39;s for people not admitted in ICU is [95.7375519023781 , 95.738972641973]&quot;</code></pre>
+<p>The 95% confidence intervals far from overlap and we can say with 95% confidence that the death rate is significantly higher for patients who have been admitted to the ICU. No hypothesis test is required.</p>
+</div>

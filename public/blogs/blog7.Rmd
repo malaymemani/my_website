@@ -1,0 +1,234 @@
+---
+date: "2020-09-19"
+description: 
+draft: false
+image: covid.jpg
+keywords: ""
+slug: blog7
+title: CDC COVID-19 Public Use Data 
+---
+
+```{r load-libraries, include=FALSE}
+library(tidyverse)  # Load ggplot2, dplyr, and all the other tidyverse packages
+library(mosaic)
+library(ggthemes)
+library(lubridate)
+library(here)
+library(skimr)
+library(janitor)
+library(httr)
+library(readxl)
+library(vroom)
+library(infer)
+```
+
+[CDC Covid-19 Case Surveillance Data](https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data/vbim-akqf). There are well over 3 million entries of individual, de-identified patient data.
+
+## Loading the data set and summary statistics
+
+Below, the data set has been loaded and summary statistics have been provided.
+
+```{r, cache=TRUE}
+# URL link to CDC to download data
+url <- "https://data.cdc.gov/api/views/vbim-akqf/rows.csv?accessType=DOWNLOAD"
+
+covid_data <- vroom(url)%>% # Downloading data 
+  clean_names() # cleaning data
+
+skim(covid_data) # generating summary statistics
+
+```
+
+The summary statistics reveal certain variables have missing values and needs to be cleaned. 
+
+## Exploratory Data Analysis: Co-Morbidities
+
+Given the data set, it would be interesting to explore the death rate by age group and gender with people who had co-morbidities or not.   
+
+```{r}
+covid_data_deathrate1 <- covid_data %>% # creating a new variable
+  filter(!(death_yn %in%c("Missing","Unknown")), # filtering for missing and unknown in various variables
+         !(medcond_yn %in%c("Missing","Unknown")),
+         !(is.na(age_group)), 
+         !(age_group %in%c("Missing","Unknown")),
+         !(is.na(sex)), 
+         !(sex %in%c("Missing","Unknown"))) %>% 
+  
+ group_by (age_group, sex, medcond_yn, death_yn) %>% # grouping by various variables
+  count(death_yn)  %>% # counting death_yn by the grouped variables
+  group_by (age_group, sex, medcond_yn) %>% # grouping by various variables
+  mutate(death_rate = n*100/sum(n)) %>% # adding death rate
+  filter(death_yn=="Yes") %>% # filtering for "Yes" values
+  mutate(comorb = ifelse(medcond_yn=="No","Without Comorbidities","With Comorbidities"), # adding comorb
+         death_rate = round(death_rate,1)) # rounding death rate by 1 decimal point
+
+covid_data_deathrate1 %>%  
+  ggplot(aes(x= age_group, y = death_rate))+ # specifying the axes
+  geom_col(fill="#8b9dc3")+ # generating a column graph and colouring the columns
+  coord_flip()+ # flipping the axes
+  facet_grid(col=vars(sex),row=vars(comorb))+ # laying out panels in a grid
+  theme(axis.text.x = element_text(angle = 30)) + # tilting the x axis labels by 30 degrees
+  geom_text(aes(label=death_rate), # labeling the columns
+            position=position_dodge(width=0.9), # adjusting the position of column labels
+            hjust = -0.25)  + 
+  theme_bw()+ # adding a black and white theme
+  labs(title="Covid death % by age group, sex and presence of co-morbidities",
+       x="",y="", caption="Source:CDC") # adding a title and source caption 
+```
+
+Clearly in the US, people with co-morbities are at a higher risk of dying regardless of gender. Having said that, the graph above demonstrates that males are at a higher risk of dying via the virus in any category and age group. Also, on average, it can be seen that the lowest death rate across categories is between the ages of 10-30 and increases in a linear fashion post 30. This means that the death rate for infants is marginally higher than teenagers and youngsters in their 20's. 
+
+## Confidence Intervals: Co-Morbidities
+
+To analyse the effects of co-morbidities with death rates in a gender neutral manner, 95% confidence intervals have been created below. If the intervals overlap a deeper study with hypothesis testing would have to be done. 
+
+```{r}
+#Calculating CI for with co-morbidities
+covid_data_ci_yes <- covid_data %>% # creating a variable
+  filter(!(death_yn %in%c("Missing","Unknown")), # filtering for missing and unknown in various variables
+         !(medcond_yn %in%c("Missing","Unknown")),
+         !(is.na(age_group)), 
+         !(age_group %in%c("Missing","Unknown")),
+         !(is.na(sex)), 
+         !(sex %in%c("Missing","Unknown"))) %>% 
+
+  group_by (medcond_yn, death_yn) %>% # grouping by variables
+  count(death_yn)  %>% # counting death_yn by the grouped variables 
+  group_by (medcond_yn) %>% # grouping by medcond_yn
+  filter(medcond_yn == 'Yes') %>% # filtering  
+  mutate(death_rate = n*100/sum(n), # adding death rate
+         total = sum(n)) %>% # summing grouped variable
+  filter(death_yn=="Yes") %>% # filtering 
+  mutate( se = sqrt((death_rate*(1-death_rate/100)/100)/total), # calculating standard error
+         t_critical=qt(0.975, total -1), # calculating T value 
+         margin_of_error_WithComorbidities=t_critical*se, # calculating margin of error 
+        WithComorbidities_low=death_rate-margin_of_error_WithComorbidities, # calculating lower CI
+        WithComorbidities_high=death_rate+margin_of_error_WithComorbidities) # calculating upper CI
+
+#CI for Deathrate with comorbidities is: 
+paste("CI for Deathrate with comobidities is [" , covid_data_ci_yes$WithComorbidities_low, ' , ', covid_data_ci_yes$WithComorbidities_high,"]",sep = '') # printing CI 
+
+#Calculating CI for no comorbidities
+covid_data_ci_no <- covid_data %>% # creating a variable
+  filter(!(death_yn %in%c("Missing","Unknown")), # filtering for missing and unknown in various variables
+         !(medcond_yn %in%c("Missing","Unknown")),
+         !(is.na(age_group)), 
+         !(age_group %in%c("Missing","Unknown")),
+         !(is.na(sex)), 
+         !(sex %in%c("Missing","Unknown"))) %>%  
+
+  group_by (medcond_yn, death_yn) %>% # grouping by variables
+  count(death_yn)  %>% # counting death_yn by the grouped variables
+  group_by (medcond_yn) %>% # grouping by medcond_yn
+  filter(medcond_yn == 'No') %>% # filtering 
+  mutate(death_rate = n*100/sum(n), # adding death rate
+         total = sum(n)) %>% # summing grouped variable
+  filter(death_yn=="Yes") %>% # filtering 
+  mutate( se = sqrt((death_rate*(1-death_rate/100)/100)/total), # calculating standard error
+         t_critical=qt(0.975, total -1), # calculating T value
+         margin_of_error_WithoutComorbidities=t_critical*se, # calculating margin of error 
+        WithoutComorbidities_low=death_rate-margin_of_error_WithoutComorbidities, # calculating lower CI
+        WithoutComorbidities_high=death_rate+margin_of_error_WithoutComorbidities) # calculating upper CI
+#CI for Deathrate without comobidities is: 
+paste("CI for Deathrate with comobidities is [" , covid_data_ci_no$WithoutComorbidities_low, ' , ', covid_data_ci_no$WithoutComorbidities_high,"]",sep = '') # printing CI
+
+```
+
+As can be seen from the confidence intervals above that the death rates for patients with and without co-morbidities are very different with death rates for patients with co-morbidities significantly higher. Therefore, no hypothesis testing is required and it can be said with 95% confidence that the death rate among Covid patients with prior illnesses is greater given the sample. Also, another observation is that the interval bands for both are very tight - this is because the number of observations in our sample are very high.   
+
+## Exploratory Data Analysis: Admission into ICU
+
+Given the data set, another aspect to explore would be the death rate by gender and age group with admission into ICU. This would be a good way to see if the difference in death rates amongst people with serious symptoms or no/mild symptoms is significant or not.  
+
+```{r covid_challenge_2, echo=FALSE, out.width="100%"}
+covid_data_deathrate2 <- covid_data %>% # creating a new variable 
+  filter(!(death_yn %in%c("Missing","Unknown")), # filtering for missing and unknown in various variables
+         !(icu_yn %in%c("Missing","Unknown")),
+         !(is.na(age_group)), 
+         !(age_group %in%c("Missing","Unknown")),
+         !(is.na(sex)), 
+         !(sex %in%c("Missing","Unknown"))) %>% 
+  
+ group_by (age_group, sex, icu_yn, death_yn) %>% # grouping by variables
+  count(death_yn)  %>% # counting death_yn by the grouped variables
+  group_by (age_group, sex, icu_yn) %>% # grouping by variables 
+  mutate(death_rate = n*100/sum(n)) %>% # adding death rate
+  filter(death_yn=="Yes") %>% # filtering
+  mutate(ICU = ifelse(icu_yn=="Yes","Admitted to ICU","No ICU"), # adding a variable
+         death_rate = round(death_rate,1)) # rounding death rate
+
+covid_data_deathrate2 %>%  
+  ggplot(aes(x= age_group, y = death_rate))+ # specifying axes
+  geom_col(fill="#ff9966")+ # generating graph and colouring columns 
+  coord_flip()+ # flipping the axes
+  facet_grid(col=vars(sex),row=vars(ICU))+ # laying out panels in a grid
+  theme(axis.text.x = element_text(angle = 30)) + # tilting the x axis labels by 30 degrees
+  geom_text(aes(label=death_rate), # labeling the columns 
+            position=position_dodge(width=0.9),hjust = -0.25)+ # adjusting the position of column labels
+  theme_bw()+ # adding black and white theme
+  labs(title="Covid death % by age group, sex and whether patient was admitted to ICU", 
+       x="",y="", caption="Source:CDC") # adding title and source caption
+
+
+```
+
+As can be seen from the graph above, the covid death rate is clearly greater for people with acute symptoms for every age group and gender. As was with co-morbidities, the death rate amongst males is higher than females across the board. It can also be seen that the lowest death rate observed on average within patients who were admitted in the ICU is infants as opposed to people with mild or no symptoms where the average death rate is lowest amongst teenagers and people in their 20's. The death rates increase in a fairly linear manner across age groups with the highest death rate being in the 80+ category. 
+
+## Confidence Intervals: Admission into ICU
+
+To look at the difference of death rate with patients admitted in ICU (acute symptoms) as opposed patients not admitted (mild/no symptoms) in a gender neutral manner, 95% confidence intervals have been created below. If the intervals overlap a deeper study with hypothesis testing would have to be done. 
+
+```{r}
+#Calculating CI for in ICU
+covid_data_ci_yes.icu <- covid_data %>% # creating a variable
+  filter(!(death_yn %in%c("Missing","Unknown")), # filtering for missing and unknown in various variables
+         !(icu_yn %in%c("Missing","Unknown")),
+         !(is.na(age_group)), 
+         !(age_group %in%c("Missing","Unknown")),
+         !(is.na(sex)), 
+         !(sex %in%c("Missing","Unknown"))) %>% 
+
+  group_by (icu_yn, death_yn) %>% # grouping by variables
+  count(death_yn)  %>% # counting death_yn by the grouped variables 
+  group_by (icu_yn) %>%  # grouping by icu_yn 
+  filter(icu_yn == 'Yes') %>% # filtering
+  mutate(death_rate = n*100/sum(n),# adding death rate
+         total = sum(n)) %>% # summing grouped variable
+  filter(death_yn=="Yes") %>% # filtering
+  mutate( se = sqrt((death_rate*(1-death_rate/100)/100)/total), # calculating standard error
+         t_critical=qt(0.975, total -1), # calculating T value
+         margin_of_error_in_icu=t_critical*se, # calculating margin of error
+        inicu_low=death_rate-margin_of_error_in_icu, # calculating lower CI
+        inicu_high=death_rate+margin_of_error_in_icu) # calculating upper CI 
+
+#CI for Deathrate with comobidities is: 
+paste("CI for Deathrate's for people admitted in ICU is [" , covid_data_ci_yes.icu$inicu_low, ' , ', covid_data_ci_yes.icu$inicu_high,"]",sep = '') # printing CI
+
+#Calculating CI for not in ICU
+covid_data_ci_no.icu <- covid_data %>% # creating a variable 
+  filter(!(death_yn %in%c("Missing","Unknown")), # filtering for missing and unknown in various variables
+         !(icu_yn %in%c("Missing","Unknown")),
+         !(is.na(age_group)), 
+         !(age_group %in%c("Missing","Unknown")),
+         !(is.na(sex)), 
+         !(sex %in%c("Missing","Unknown"))) %>% 
+
+  group_by (icu_yn, death_yn) %>% # grouping by variables
+  count(death_yn)  %>% # counting death_yn by the grouped variables
+  group_by (icu_yn) %>% # grouping by icu_yn
+  filter(icu_yn == 'No') %>% # filtering 
+  mutate(death_rate = n*100/sum(n),# adding death rate
+         total = sum(n)) %>% # summing grouped variable
+  filter(death_yn=="No") %>% # filtering
+  mutate( se = sqrt((death_rate*(1-death_rate/100)/100)/total), # calculating standard error
+         t_critical=qt(0.975, total -1), # calculating T value
+         margin_of_error_not_in_icu=t_critical*se, # calculating margin of error 
+        notinicu_low=death_rate-margin_of_error_not_in_icu, # calculating lower CI
+        notinicu_high=death_rate+margin_of_error_not_in_icu) # calculating upper CI
+
+#CI for Deathrate with comobidities is: 
+paste("CI for Deathrate's for people not admitted in ICU is [" , covid_data_ci_no.icu$notinicu_low, ' , ', covid_data_ci_no.icu$notinicu_high,"]",sep = '') # printing CI
+
+```
+
+The 95% confidence intervals far from overlap and we can say with 95% confidence that the death rate is significantly higher for patients who have been admitted to the ICU. No hypothesis test is required. 

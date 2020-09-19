@@ -1,0 +1,1054 @@
+---
+date: "2020-09-19"
+description: Checking Out IBM Employees!
+draft: false
+image: hr1.jpg
+keywords: ""
+slug: blog6
+title: IBM HR Analytics 
+---
+
+
+
+<p>The <a href="https://www.kaggle.com/pavansubhasht/ibm-hr-analytics-attrition-dataset">IBM HR Analytics Employee Attrition &amp; Performance dataset</a> is a fictional data set created by IBM data scientists. Among other things, the data set includes employees’ income, their distance from work, their position in the company, their level of education, etc. A full description can be found on the website.</p>
+<div id="data-cleaning-and-reorganising" class="section level2">
+<h2>Data cleaning and reorganising</h2>
+<p>At first, the data set is loaded and summary statistics are provided.</p>
+<pre class="r"><code>hr_dataset &lt;- read_csv(here::here(&quot;data&quot;, &quot;datasets_1067_1925_WA_Fn-UseC_-HR-Employee-Attrition.csv&quot;)) # loading data set</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   .default = col_double(),
+##   Attrition = col_character(),
+##   BusinessTravel = col_character(),
+##   Department = col_character(),
+##   EducationField = col_character(),
+##   Gender = col_character(),
+##   JobRole = col_character(),
+##   MaritalStatus = col_character(),
+##   Over18 = col_character(),
+##   OverTime = col_character()
+## )</code></pre>
+<pre><code>## See spec(...) for full column specifications.</code></pre>
+<pre class="r"><code>skim(hr_dataset) # summary statistics</code></pre>
+<table>
+<caption><span id="tab:unnamed-chunk-1">Table 1: </span>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td align="left">Name</td>
+<td align="left">hr_dataset</td>
+</tr>
+<tr class="even">
+<td align="left">Number of rows</td>
+<td align="left">1470</td>
+</tr>
+<tr class="odd">
+<td align="left">Number of columns</td>
+<td align="left">35</td>
+</tr>
+<tr class="even">
+<td align="left">_______________________</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Column type frequency:</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">character</td>
+<td align="left">9</td>
+</tr>
+<tr class="odd">
+<td align="left">numeric</td>
+<td align="left">26</td>
+</tr>
+<tr class="even">
+<td align="left">________________________</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Group variables</td>
+<td align="left">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: character</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">min</th>
+<th align="right">max</th>
+<th align="right">empty</th>
+<th align="right">n_unique</th>
+<th align="right">whitespace</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Attrition</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">BusinessTravel</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">10</td>
+<td align="right">17</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Department</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td align="right">22</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">EducationField</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td align="right">16</td>
+<td align="right">0</td>
+<td align="right">6</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Gender</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">JobRole</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">7</td>
+<td align="right">25</td>
+<td align="right">0</td>
+<td align="right">9</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">MaritalStatus</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">6</td>
+<td align="right">8</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Over18</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">OverTime</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">p0</th>
+<th align="right">p25</th>
+<th align="right">p50</th>
+<th align="right">p75</th>
+<th align="right">p100</th>
+<th align="left">hist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Age</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">36.92</td>
+<td align="right">9.14</td>
+<td align="right">18</td>
+<td align="right">30.00</td>
+<td align="right">36.0</td>
+<td align="right">43.00</td>
+<td align="right">60</td>
+<td align="left">▂▇▇▃▂</td>
+</tr>
+<tr class="even">
+<td align="left">DailyRate</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">802.49</td>
+<td align="right">403.51</td>
+<td align="right">102</td>
+<td align="right">465.00</td>
+<td align="right">802.0</td>
+<td align="right">1157.00</td>
+<td align="right">1499</td>
+<td align="left">▇▇▇▇▇</td>
+</tr>
+<tr class="odd">
+<td align="left">DistanceFromHome</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">9.19</td>
+<td align="right">8.11</td>
+<td align="right">1</td>
+<td align="right">2.00</td>
+<td align="right">7.0</td>
+<td align="right">14.00</td>
+<td align="right">29</td>
+<td align="left">▇▅▂▂▂</td>
+</tr>
+<tr class="even">
+<td align="left">Education</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2.91</td>
+<td align="right">1.02</td>
+<td align="right">1</td>
+<td align="right">2.00</td>
+<td align="right">3.0</td>
+<td align="right">4.00</td>
+<td align="right">5</td>
+<td align="left">▂▃▇▆▁</td>
+</tr>
+<tr class="odd">
+<td align="left">EmployeeCount</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1.00</td>
+<td align="right">0.00</td>
+<td align="right">1</td>
+<td align="right">1.00</td>
+<td align="right">1.0</td>
+<td align="right">1.00</td>
+<td align="right">1</td>
+<td align="left">▁▁▇▁▁</td>
+</tr>
+<tr class="even">
+<td align="left">EmployeeNumber</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1024.87</td>
+<td align="right">602.02</td>
+<td align="right">1</td>
+<td align="right">491.25</td>
+<td align="right">1020.5</td>
+<td align="right">1555.75</td>
+<td align="right">2068</td>
+<td align="left">▇▇▇▇▇</td>
+</tr>
+<tr class="odd">
+<td align="left">EnvironmentSatisfaction</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2.72</td>
+<td align="right">1.09</td>
+<td align="right">1</td>
+<td align="right">2.00</td>
+<td align="right">3.0</td>
+<td align="right">4.00</td>
+<td align="right">4</td>
+<td align="left">▅▅▁▇▇</td>
+</tr>
+<tr class="even">
+<td align="left">HourlyRate</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">65.89</td>
+<td align="right">20.33</td>
+<td align="right">30</td>
+<td align="right">48.00</td>
+<td align="right">66.0</td>
+<td align="right">83.75</td>
+<td align="right">100</td>
+<td align="left">▇▇▇▇▇</td>
+</tr>
+<tr class="odd">
+<td align="left">JobInvolvement</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2.73</td>
+<td align="right">0.71</td>
+<td align="right">1</td>
+<td align="right">2.00</td>
+<td align="right">3.0</td>
+<td align="right">3.00</td>
+<td align="right">4</td>
+<td align="left">▁▃▁▇▁</td>
+</tr>
+<tr class="even">
+<td align="left">JobLevel</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2.06</td>
+<td align="right">1.11</td>
+<td align="right">1</td>
+<td align="right">1.00</td>
+<td align="right">2.0</td>
+<td align="right">3.00</td>
+<td align="right">5</td>
+<td align="left">▇▇▃▂▁</td>
+</tr>
+<tr class="odd">
+<td align="left">JobSatisfaction</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2.73</td>
+<td align="right">1.10</td>
+<td align="right">1</td>
+<td align="right">2.00</td>
+<td align="right">3.0</td>
+<td align="right">4.00</td>
+<td align="right">4</td>
+<td align="left">▅▅▁▇▇</td>
+</tr>
+<tr class="even">
+<td align="left">MonthlyIncome</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">6502.93</td>
+<td align="right">4707.96</td>
+<td align="right">1009</td>
+<td align="right">2911.00</td>
+<td align="right">4919.0</td>
+<td align="right">8379.00</td>
+<td align="right">19999</td>
+<td align="left">▇▅▂▁▂</td>
+</tr>
+<tr class="odd">
+<td align="left">MonthlyRate</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">14313.10</td>
+<td align="right">7117.79</td>
+<td align="right">2094</td>
+<td align="right">8047.00</td>
+<td align="right">14235.5</td>
+<td align="right">20461.50</td>
+<td align="right">26999</td>
+<td align="left">▇▇▇▇▇</td>
+</tr>
+<tr class="even">
+<td align="left">NumCompaniesWorked</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2.69</td>
+<td align="right">2.50</td>
+<td align="right">0</td>
+<td align="right">1.00</td>
+<td align="right">2.0</td>
+<td align="right">4.00</td>
+<td align="right">9</td>
+<td align="left">▇▃▂▂▁</td>
+</tr>
+<tr class="odd">
+<td align="left">PercentSalaryHike</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">15.21</td>
+<td align="right">3.66</td>
+<td align="right">11</td>
+<td align="right">12.00</td>
+<td align="right">14.0</td>
+<td align="right">18.00</td>
+<td align="right">25</td>
+<td align="left">▇▅▃▂▁</td>
+</tr>
+<tr class="even">
+<td align="left">PerformanceRating</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">3.15</td>
+<td align="right">0.36</td>
+<td align="right">3</td>
+<td align="right">3.00</td>
+<td align="right">3.0</td>
+<td align="right">3.00</td>
+<td align="right">4</td>
+<td align="left">▇▁▁▁▂</td>
+</tr>
+<tr class="odd">
+<td align="left">RelationshipSatisfaction</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2.71</td>
+<td align="right">1.08</td>
+<td align="right">1</td>
+<td align="right">2.00</td>
+<td align="right">3.0</td>
+<td align="right">4.00</td>
+<td align="right">4</td>
+<td align="left">▅▅▁▇▇</td>
+</tr>
+<tr class="even">
+<td align="left">StandardHours</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">80.00</td>
+<td align="right">0.00</td>
+<td align="right">80</td>
+<td align="right">80.00</td>
+<td align="right">80.0</td>
+<td align="right">80.00</td>
+<td align="right">80</td>
+<td align="left">▁▁▇▁▁</td>
+</tr>
+<tr class="odd">
+<td align="left">StockOptionLevel</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0.79</td>
+<td align="right">0.85</td>
+<td align="right">0</td>
+<td align="right">0.00</td>
+<td align="right">1.0</td>
+<td align="right">1.00</td>
+<td align="right">3</td>
+<td align="left">▇▇▁▂▁</td>
+</tr>
+<tr class="even">
+<td align="left">TotalWorkingYears</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">11.28</td>
+<td align="right">7.78</td>
+<td align="right">0</td>
+<td align="right">6.00</td>
+<td align="right">10.0</td>
+<td align="right">15.00</td>
+<td align="right">40</td>
+<td align="left">▇▇▂▁▁</td>
+</tr>
+<tr class="odd">
+<td align="left">TrainingTimesLastYear</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2.80</td>
+<td align="right">1.29</td>
+<td align="right">0</td>
+<td align="right">2.00</td>
+<td align="right">3.0</td>
+<td align="right">3.00</td>
+<td align="right">6</td>
+<td align="left">▂▇▇▂▃</td>
+</tr>
+<tr class="even">
+<td align="left">WorkLifeBalance</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2.76</td>
+<td align="right">0.71</td>
+<td align="right">1</td>
+<td align="right">2.00</td>
+<td align="right">3.0</td>
+<td align="right">3.00</td>
+<td align="right">4</td>
+<td align="left">▁▃▁▇▂</td>
+</tr>
+<tr class="odd">
+<td align="left">YearsAtCompany</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">7.01</td>
+<td align="right">6.13</td>
+<td align="right">0</td>
+<td align="right">3.00</td>
+<td align="right">5.0</td>
+<td align="right">9.00</td>
+<td align="right">40</td>
+<td align="left">▇▂▁▁▁</td>
+</tr>
+<tr class="even">
+<td align="left">YearsInCurrentRole</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">4.23</td>
+<td align="right">3.62</td>
+<td align="right">0</td>
+<td align="right">2.00</td>
+<td align="right">3.0</td>
+<td align="right">7.00</td>
+<td align="right">18</td>
+<td align="left">▇▃▂▁▁</td>
+</tr>
+<tr class="odd">
+<td align="left">YearsSinceLastPromotion</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2.19</td>
+<td align="right">3.22</td>
+<td align="right">0</td>
+<td align="right">0.00</td>
+<td align="right">1.0</td>
+<td align="right">3.00</td>
+<td align="right">15</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td align="left">YearsWithCurrManager</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">4.12</td>
+<td align="right">3.57</td>
+<td align="right">0</td>
+<td align="right">2.00</td>
+<td align="right">3.0</td>
+<td align="right">7.00</td>
+<td align="right">17</td>
+<td align="left">▇▂▅▁▁</td>
+</tr>
+</tbody>
+</table>
+<p>Data set reveals there are 26 Quantitative and 9 qualitative parameters about employees working at IBM. However, this is not a true picture as there are many rating-based and level-based variables Viz. Education level, Environment satisfaction etc. which have been coded as numeric values and hence a basic data cleaning is necessary. One important observation is that the data has no missing values.</p>
+<pre class="r"><code># Basic Data Cleaning and re-coding of levels
+
+hr_cleaned &lt;- hr_dataset %&gt;% 
+  clean_names() %&gt;% 
+  mutate(
+    education = case_when(
+      education == 1 ~ &quot;Below College&quot;,
+      education == 2 ~ &quot;College&quot;,
+      education == 3 ~ &quot;Bachelor&quot;,
+      education == 4 ~ &quot;Master&quot;,
+      education == 5 ~ &quot;Doctor&quot;
+    ),
+    environment_satisfaction = case_when(
+      environment_satisfaction == 1 ~ &quot;Low&quot;,
+      environment_satisfaction == 2 ~ &quot;Medium&quot;,
+      environment_satisfaction == 3 ~ &quot;High&quot;,
+      environment_satisfaction == 4 ~ &quot;Very High&quot;
+    ),
+    job_satisfaction = case_when(
+      job_satisfaction == 1 ~ &quot;Low&quot;,
+      job_satisfaction == 2 ~ &quot;Medium&quot;,
+      job_satisfaction == 3 ~ &quot;High&quot;,
+      job_satisfaction == 4 ~ &quot;Very High&quot;
+    ),
+    performance_rating = case_when(
+      performance_rating == 1 ~ &quot;Low&quot;,
+      performance_rating == 2 ~ &quot;Good&quot;,
+      performance_rating == 3 ~ &quot;Excellent&quot;,
+      performance_rating == 4 ~ &quot;Outstanding&quot;
+    ),
+    work_life_balance = case_when(
+      work_life_balance == 1 ~ &quot;Bad&quot;,
+      work_life_balance == 2 ~ &quot;Good&quot;,
+      work_life_balance == 3 ~ &quot;Better&quot;,
+      work_life_balance == 4 ~ &quot;Best&quot;
+    )
+  ) %&gt;% 
+  select(age, attrition, daily_rate, department,
+         distance_from_home, education,
+         gender, job_role,environment_satisfaction,
+         job_satisfaction, marital_status,
+         monthly_income, num_companies_worked, percent_salary_hike,
+         performance_rating, total_working_years,
+         work_life_balance, years_at_company,
+         years_since_last_promotion,)
+
+
+skim(hr_cleaned) # summary statistics</code></pre>
+<table>
+<caption><span id="tab:unnamed-chunk-2">Table 2: </span>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td align="left">Name</td>
+<td align="left">hr_cleaned</td>
+</tr>
+<tr class="even">
+<td align="left">Number of rows</td>
+<td align="left">1470</td>
+</tr>
+<tr class="odd">
+<td align="left">Number of columns</td>
+<td align="left">19</td>
+</tr>
+<tr class="even">
+<td align="left">_______________________</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Column type frequency:</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">character</td>
+<td align="left">10</td>
+</tr>
+<tr class="odd">
+<td align="left">numeric</td>
+<td align="left">9</td>
+</tr>
+<tr class="even">
+<td align="left">________________________</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Group variables</td>
+<td align="left">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: character</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">min</th>
+<th align="right">max</th>
+<th align="right">empty</th>
+<th align="right">n_unique</th>
+<th align="right">whitespace</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">attrition</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">department</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td align="right">22</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">education</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">6</td>
+<td align="right">13</td>
+<td align="right">0</td>
+<td align="right">5</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">gender</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">job_role</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">7</td>
+<td align="right">25</td>
+<td align="right">0</td>
+<td align="right">9</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">environment_satisfaction</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">9</td>
+<td align="right">0</td>
+<td align="right">4</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">job_satisfaction</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">9</td>
+<td align="right">0</td>
+<td align="right">4</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">marital_status</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">6</td>
+<td align="right">8</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">performance_rating</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">9</td>
+<td align="right">11</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">work_life_balance</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">4</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">p0</th>
+<th align="right">p25</th>
+<th align="right">p50</th>
+<th align="right">p75</th>
+<th align="right">p100</th>
+<th align="left">hist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">age</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">36.92</td>
+<td align="right">9.14</td>
+<td align="right">18</td>
+<td align="right">30</td>
+<td align="right">36</td>
+<td align="right">43</td>
+<td align="right">60</td>
+<td align="left">▂▇▇▃▂</td>
+</tr>
+<tr class="even">
+<td align="left">daily_rate</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">802.49</td>
+<td align="right">403.51</td>
+<td align="right">102</td>
+<td align="right">465</td>
+<td align="right">802</td>
+<td align="right">1157</td>
+<td align="right">1499</td>
+<td align="left">▇▇▇▇▇</td>
+</tr>
+<tr class="odd">
+<td align="left">distance_from_home</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">9.19</td>
+<td align="right">8.11</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">7</td>
+<td align="right">14</td>
+<td align="right">29</td>
+<td align="left">▇▅▂▂▂</td>
+</tr>
+<tr class="even">
+<td align="left">monthly_income</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">6502.93</td>
+<td align="right">4707.96</td>
+<td align="right">1009</td>
+<td align="right">2911</td>
+<td align="right">4919</td>
+<td align="right">8379</td>
+<td align="right">19999</td>
+<td align="left">▇▅▂▁▂</td>
+</tr>
+<tr class="odd">
+<td align="left">num_companies_worked</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2.69</td>
+<td align="right">2.50</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">4</td>
+<td align="right">9</td>
+<td align="left">▇▃▂▂▁</td>
+</tr>
+<tr class="even">
+<td align="left">percent_salary_hike</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">15.21</td>
+<td align="right">3.66</td>
+<td align="right">11</td>
+<td align="right">12</td>
+<td align="right">14</td>
+<td align="right">18</td>
+<td align="right">25</td>
+<td align="left">▇▅▃▂▁</td>
+</tr>
+<tr class="odd">
+<td align="left">total_working_years</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">11.28</td>
+<td align="right">7.78</td>
+<td align="right">0</td>
+<td align="right">6</td>
+<td align="right">10</td>
+<td align="right">15</td>
+<td align="right">40</td>
+<td align="left">▇▇▂▁▁</td>
+</tr>
+<tr class="even">
+<td align="left">years_at_company</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">7.01</td>
+<td align="right">6.13</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">5</td>
+<td align="right">9</td>
+<td align="right">40</td>
+<td align="left">▇▂▁▁▁</td>
+</tr>
+<tr class="odd">
+<td align="left">years_since_last_promotion</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2.19</td>
+<td align="right">3.22</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">15</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+</tbody>
+</table>
+<p>Post data cleaning, we are left with 19 attributes in total. Of which - 9 are Numeric and rest are qualitative.</p>
+</div>
+<div id="exploratory-data-analysis" class="section level2">
+<h2>Exploratory Data Analysis</h2>
+<p>Creating new subsets of hr_cleaned for later analyses on factors like Job Satisfaction, Education level, Environment satisfaction, Performance ratings and Work satisfaction among employees across departments.</p>
+<pre class="r"><code>JobSat&lt;-hr_cleaned%&gt;% # creating variable
+  group_by(department)%&gt;% # grouping by department
+  count(job_satisfaction)%&gt;% # counting variable enclosed by grouped variable 
+  mutate(n_percent=n/sum(n)) # adding a proportion </code></pre>
+<pre><code>## Warning: `count_()` is deprecated as of dplyr 0.7.0.
+## Please use `count()` instead.
+## See vignette(&#39;programming&#39;) for more help
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.</code></pre>
+<pre class="r"><code>Edu&lt;-hr_cleaned%&gt;% # creating variable
+  group_by(department)%&gt;% # grouping by department
+  count(education)%&gt;% # counting variable enclosed by grouped variable 
+  mutate(n_percent=n/sum(n)) # adding a proportion
+
+Enviro&lt;-hr_cleaned%&gt;% # creating variable
+  group_by(department)%&gt;% # grouping by department
+  count(environment_satisfaction)%&gt;% # counting variable enclosed by grouped variable
+  mutate(n_percent=n/sum(n)) # adding a proportion
+
+Perf&lt;-hr_cleaned%&gt;% # creating variable
+  group_by(department)%&gt;% # grouping by department
+  count(performance_rating)%&gt;% # counting variable enclosed by grouped variable
+  mutate(n_percent=n/sum(n)) # adding a proportion
+
+Work&lt;-hr_cleaned%&gt;% # creating variable
+  group_by(department)%&gt;% # grouping by department
+  count(work_life_balance)%&gt;% # counting variable enclosed by grouped variable
+  mutate(n_percent=n/sum(n)) # adding a proportion</code></pre>
+<pre class="r"><code>ggplot(Edu,aes(x=department,  # speciyfying axes
+               y=n_percent, 
+               fill=factor(education, levels=c( &quot;Doctor&quot;,&quot;Master&quot;, &quot;Bachelor&quot;, &quot;College&quot;, &quot;Below College&quot;))))+
+ geom_col()+ # generating graph
+labs(title=&quot;Education Level by Department at IBM&quot;, # adding labels and colouring 
+       x=&quot;Department&quot;,
+       y=&quot;Percentage Education&quot;,
+       fill= &quot;Education Level&quot;)+
+    theme(axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=0.5)) # adjusting x axis label</code></pre>
+<p><img src="/blogs/blog6_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(Edu)+
+  aes(x=education, y = n_percent, fill = education)+ # speciyfying axes
+  geom_col()+  # generating graph
+  facet_grid(~department)+ # faceting by department
+  labs(title=&quot;Education Level by Department at IBM&quot;, # adding labels and colouring 
+       x=&quot;Department&quot;,
+       y=&quot;Percentage Education&quot;,
+       fill= &quot;Education Level&quot;)+
+    theme(axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=0.5)) # adjusting x axis label</code></pre>
+<p><img src="/blogs/blog6_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+<p>Though there’s an almost comparables mix of education levels of employees across depatment, most of the employees are Bachelor-level educated in all departments. More employees hold Masters in Sales than other departments.</p>
+<pre class="r"><code>ggplot(Enviro,aes(x=department, y=n_percent, # specifying axes and colouring
+                  fill=factor(environment_satisfaction, 
+                              levels=c(&quot;Very High&quot;, &quot;High&quot;, &quot;Medium&quot; , &quot;Low&quot;))))+
+ geom_col()+ # generating graph
+labs(title=&quot;Environment Satisfaction by Department at IBM&quot;, # adding title and labels
+       x=&quot;Department&quot;,
+       y=&quot;Percentage Vote&quot;,
+       fill= &quot;Environment Satisfaction&quot;)+
+    theme(axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=0.5)) # adjusting x axis</code></pre>
+<p><img src="/blogs/blog6_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>Enviro %&gt;% ggplot()+ # creating variable 
+  aes(x=environment_satisfaction, # specifying axes and colouring
+      y = n_percent, 
+      fill=environment_satisfaction)+
+  geom_col()+ # generating graph
+  facet_grid(~department)+ # faceting by department
+labs(title=&quot;Environment Satisfaction by Department at IBM&quot;, # adding title and labels
+       x=&quot;Department&quot;,
+       y=&quot;Percentage Vote&quot;,
+       fill= &quot;Environment Satisfaction&quot;)+
+    theme(axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=0.5)) # adjusting x axis</code></pre>
+<p><img src="/blogs/blog6_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<p>Around 41% employees in HR seems to be satisfied with the environmental conditions, this seems to be because one of the key roles of the HR department is to keep a positive organisational environment. 31% of Research employees felt very highly satisfied by Environmental conditions, a reason for this could be - R&amp;D is a highly specialised department, therefore the people who join such roles are specifically trained for this and expect what is to come. However, sales guys seems to be divided into comparable groups of employees to have voted for all the categories in the range 20%-30%.</p>
+<p>Post this, it would be interesting to look at how departments perform.</p>
+<pre class="r"><code>ggplot(Perf,aes(x=department, y=n_percent, # specifying axes and colouring
+                fill=factor(performance_rating, 
+                            levels=c(&quot;Outstanding&quot;, &quot;Excellent&quot;, &quot;Good&quot; , &quot;Low&quot;))))+
+ geom_col()+ # generating graph
+ labs(title=&quot;Performance Rating by Department at IBM&quot;,  # adding title and labels
+       x=&quot;Department&quot;,
+       y=&quot;Percentage Vote&quot;,
+       fill= &quot;Performance Rating&quot;)+
+    theme(axis.text.x = element_text(angle = 30, vjust = 0.5, hjust=0.5)) # adjusting x axis</code></pre>
+<p><img src="/blogs/blog6_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>Performance ratings seems to be equally distributed across employees across departments. This is an interesting statistic given the mixed environmental satisfaction response. Despite such a positive performance rating, on average one in five employees are dissatisfied with the environmental conditions. Further, an attrition rate analysis seems to be logical.</p>
+</div>
+<div id="attrition-rates" class="section level2">
+<h2>Attrition Rates</h2>
+<pre class="r"><code>overalll_attrition &lt;- hr_cleaned %&gt;% # creating variable
+  group_by(attrition) %&gt;% # grouping by attrition
+  summarise(count = n()) %&gt;% # counting variable
+  mutate(overall_attrition = paste(round(count*100/sum(count),0),&quot;%&quot;,sep=&quot;&quot;)) %&gt;% # adding a variable
+  filter(attrition==&quot;Yes&quot;) %&gt;% # filtering 
+  select(overall_attrition) # selecting overall attrition</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre class="r"><code>hr_cleaned %&gt;% 
+  group_by(attrition, department) %&gt;% # grouping by variables
+  summarise(count=n()) %&gt;% # counting by grouped variables
+  group_by(department) %&gt;% # grouping by department
+  mutate(attrition_rate=paste(round(count*100/sum(count),0),&quot;%&quot;,sep=&quot;&quot;)) %&gt;% # adding a variable and rounding
+  filter(attrition==&quot;Yes&quot;) %&gt;% # filtering
+  select(department, attrition_rate) %&gt;% # selecting certain variables
+  ungroup() %&gt;% # ungrouping previously grouped variables
+  add_row(department = &#39;Overall&#39; , attrition_rate = overalll_attrition[[1]]) # adding an additional row with a variable</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;attrition&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## # A tibble: 4 x 2
+##   department             attrition_rate
+##   &lt;chr&gt;                  &lt;chr&gt;         
+## 1 Human Resources        19%           
+## 2 Research &amp; Development 14%           
+## 3 Sales                  21%           
+## 4 Overall                16%</code></pre>
+<pre class="r"><code>hr_cleaned %&gt;% 
+  group_by(attrition, department) %&gt;% # grouping by variables
+  summarise(count=n()) %&gt;% # counting by grouped variables
+  group_by(department) %&gt;% # grouping by department
+  mutate(attrition_rate=paste(round(count*100/sum(count),0),&quot;%&quot;,sep=&quot;&quot;)) %&gt;% # adding a variable and rounding
+  filter(attrition==&quot;Yes&quot;) %&gt;% # filtering
+  select(department, attrition_rate) %&gt;% ungroup() %&gt;% # selecting certain variables
+  add_row(department = &#39;Overall&#39; , attrition_rate = overalll_attrition[[1]]) %&gt;% # adding an additional row with a variable 
+  mutate(per_value = as.numeric(substr(attrition_rate,1,2))) %&gt;% # creating a variable
+  ggplot()+
+  aes(x = department , y =per_value)+ # specifying axes
+  geom_col(fill=&quot;#8b9dc3&quot;)+ # generating graph
+  theme_bw()+ # adding a black and white theme
+  labs(title = &quot;Attrition Rates at IBM&quot;, x=&quot;Department&quot;, y=&quot;Attrition Rate (%)&quot;) # adding labels and title </code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;attrition&#39; (override with `.groups` argument)</code></pre>
+<p><img src="/blogs/blog6_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>The overall attrition seems to be around 16%. This is in line with our previous analysis which indicated that around 20% employees felt dissatisfied with the environmental conditions. Over 20% of Sales employees attrite. and R&amp;D has minimum attrition. This data is logical as research and development is a proprietary role and IBM must have put in place non-compete policies for such employees. On the other hand sales is a highly competitive fast paced role and thus high attrition is to be expected.</p>
+<p>Subsequently, distributions of age, years at IBM, monthly income and years since last promotion have been analysed.</p>
+</div>
+<div id="distributions" class="section level2">
+<h2>Distributions</h2>
+<pre class="r"><code>ggplot(hr_cleaned,aes(x=age))+  #specifying x axis
+  geom_density(fill=&quot;#8b9dc3&quot;)+ #generating density plot
+  facet_wrap(~department) #facet by department</code></pre>
+<p><img src="/blogs/blog6_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<pre class="r"><code>hr_cleaned %&gt;% 
+  group_by(department) %&gt;%  #grouped by department
+  summarize(mean_age=round(mean(age),0), #calculating mean_age and rounded it to 0 decimal place
+            median_age = round(median(age),0)) #calculating median age</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre><code>## # A tibble: 3 x 3
+##   department             mean_age median_age
+##   &lt;chr&gt;                     &lt;dbl&gt;      &lt;dbl&gt;
+## 1 Human Resources              38         37
+## 2 Research &amp; Development       37         36
+## 3 Sales                        37         35</code></pre>
+<p>The age of employees working in different departments seems to be fairly normally distributed with a mean age of around 37 Yrs. Median age is about 36 Yrs (very close to the average suggesting minimal extreme values). The bump to the right extreme of these curves represent perhaps the senior management age group as they are expected to have more experience and age.</p>
+<pre class="r"><code>ggplot(hr_cleaned,aes(x=years_at_company))+  #specifying x axes
+  geom_density(fill=&quot;#8b9dc3&quot;) +   #generating density plot
+  labs (x=&quot;Years at Company&quot;) + #adding x label
+  facet_wrap(~department) #facet by department</code></pre>
+<p><img src="/blogs/blog6_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>As for years at company, across departments the distribution seems to be very right skewed suggesting most employees leave in around 15 years.</p>
+<pre class="r"><code>ggplot(hr_cleaned,aes(x=monthly_income)) +  #specifying x  axes
+  geom_density(fill=&quot;#8b9dc3&quot;) +  #generating density plot
+  labs(x=&quot;Monthly Income&quot;)+ #adding x label
+  facet_wrap(~department) #facet by department</code></pre>
+<p><img src="/blogs/blog6_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>As per intuition, monthly income is right skewed with avg. monthly income of R&amp;D folks being on higher side - given the nature of their job role and the experience required. Most of the Sales people draw around USD 55,00 - 6,00 monthly. HR seems to be earning the least on a relative scale.</p>
+<pre class="r"><code>ggplot(hr_cleaned,aes(x=years_since_last_promotion))+ #specifying x axes
+  geom_density(fill=&quot;#8b9dc3&quot;) + #generating density plot
+  labs(x=&quot;Years Since Last Promotion&quot;)+  #adding x label
+  facet_wrap(~department) #facet by department</code></pre>
+<p><img src="/blogs/blog6_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>Distribution of Years since last promoted indicates that HR and Sales employees spend more time between promotions than R&amp;D folks.</p>
+</div>
